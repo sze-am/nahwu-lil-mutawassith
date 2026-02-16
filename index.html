@@ -22,7 +22,6 @@
             color: #1c1e21; 
         }
 
-        /* Layout Utama Responsive */
         header { 
             background: var(--primary); 
             color: white; 
@@ -77,6 +76,33 @@
             margin-top: 10px;
         }
 
+        /* --- Custom Modal System (No Site Identity) --- */
+        .ui-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+        .ui-modal-box {
+            background: white;
+            padding: 24px;
+            border-radius: 15px;
+            max-width: 320px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .ui-modal-text { margin-bottom: 20px; font-weight: 500; color: #333; line-height: 1.4; }
+        .ui-modal-btns { display: flex; gap: 10px; justify-content: center; }
+        .ui-btn { padding: 10px 20px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; flex: 1; }
+        .ui-btn-confirm { background: var(--primary); color: white; }
+        .ui-btn-cancel { background: #eee; color: #444; }
+
         .hidden-chat { 
             display: none; 
             position: fixed; 
@@ -120,102 +146,31 @@
             transition: opacity 0.3s ease;
         }
 
-        /* Hanya animasi untuk pesan yang benar-benar baru */
-        .new-msg {
-            animation: fadeIn 0.3s ease forwards;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .new-msg { animation: fadeIn 0.3s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .me { align-self: flex-end; background: #dcf8c6; border-top-right-radius: 2px; }
         .them { align-self: flex-start; background: #fff; border-top-left-radius: 2px; }
         
-        .status-icon {
-            font-size: 0.7rem;
-            margin-left: 5px;
-            color: #888;
-            float: right;
-            margin-top: 5px;
-        }
-
+        .status-icon { font-size: 0.7rem; margin-left: 5px; color: #888; float: right; margin-top: 5px; }
         .sending { opacity: 0.7; }
         .sending .status-icon::after { content: "🕒"; animation: blink 1s infinite; }
-
         @keyframes blink { 50% { opacity: 0.3; } }
 
         .sender-info { font-size: 0.75rem; font-weight: bold; color: #075e54; margin-bottom: 2px; display: block; }
-        
-        .img-msg { 
-            max-width: 100%; 
-            max-height: 300px; 
-            border-radius: 6px; 
-            margin-top: 5px; 
-            display: block;
-            object-fit: contain;
-            background: #eee;
-        }
+        .img-msg { max-width: 100%; max-height: 300px; border-radius: 6px; margin-top: 5px; display: block; object-fit: contain; background: #eee; }
 
-        #context-menu { 
-            display: none; 
-            position: fixed; 
-            background: white; 
-            border-radius: 10px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
-            z-index: 30000; 
-            width: 160px;
-            overflow: hidden;
-        }
+        #context-menu { display: none; position: fixed; background: white; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 30000; width: 160px; overflow: hidden; }
         .menu-item { padding: 12px 16px; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 10px; }
         .menu-item:hover { background: #f0f2f5; }
         .menu-item.delete { color: #e41e3f; }
 
         #bottom-bar { padding: 8px 12px; background: #f0f2f5; display: flex; gap: 8px; align-items: center; }
-        #text-input { 
-            flex: 1; 
-            padding: 10px 16px; 
-            border-radius: 20px; 
-            border: 1px solid #ddd; 
-            outline: none; 
-            font-size: 1rem; 
-        }
-        .btn-send { 
-            background: #075e54; 
-            color: white; 
-            border: none; 
-            width: 40px; 
-            height: 40px; 
-            border-radius: 50%; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            font-size: 1.2rem;
-            transition: 0.2s;
-        }
-        .btn-send:active { transform: scale(0.9); }
+        #text-input { flex: 1; padding: 10px 16px; border-radius: 20px; border: 1px solid #ddd; outline: none; font-size: 1rem; }
+        .btn-send { background: #075e54; color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: 0.2s; }
 
-        #name-modal { 
-            display: none; 
-            position: fixed; 
-            inset: 0; 
-            background: rgba(255,255,255,0.8); 
-            backdrop-filter: blur(8px); 
-            z-index: 20000; 
-            align-items: center; 
-            justify-content: center; 
-        }
-        .modal-box { 
-            background: white; 
-            padding: 30px; 
-            border-radius: 16px; 
-            text-align: center; 
-            width: 90%; 
-            max-width: 400px; 
-            box-shadow: 0 8px 30px rgba(0,0,0,0.1); 
-        }
+        #name-modal { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.8); backdrop-filter: blur(8px); z-index: 20000; align-items: center; justify-content: center; }
+        .modal-box { background: white; padding: 30px; border-radius: 16px; text-align: center; width: 90%; max-width: 400px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
 
         @media (max-width: 600px) {
             .container { margin: 0; border-radius: 0; padding: 20px; }
@@ -230,6 +185,16 @@
         <h1>SIAKAD - Studi Bahasa Arab</h1>
         <div style="font-size: 11px; font-weight: 500; opacity: 0.8;">Ruang Diskusi Nahwu</div>
     </header>
+
+    <div id="ui-overlay" class="ui-modal-overlay">
+        <div class="ui-modal-box">
+            <div id="ui-msg" class="ui-modal-text"></div>
+            <div class="ui-modal-btns">
+                <button id="ui-cancel" class="ui-btn ui-btn-cancel" onclick="uiClose(false)">Batal</button>
+                <button id="ui-ok" class="ui-btn ui-btn-confirm" onclick="uiClose(true)">OK</button>
+            </div>
+        </div>
+    </div>
 
     <div id="decoy-content" class="container">
         <div class="article-content">
@@ -278,11 +243,29 @@
         let selectedMsgId = null;
         let isEditing = false;
         let pendingMessages = []; 
+        let uiResolver = null;
 
-        function checkPassManual() {
+        // Custom UI Alert/Confirm Logic
+        function customUI(msg, showCancel = false) {
+            return new Promise(resolve => {
+                document.getElementById('ui-msg').innerText = msg;
+                document.getElementById('ui-cancel').style.display = showCancel ? 'block' : 'none';
+                document.getElementById('ui-overlay').style.display = 'flex';
+                uiResolver = resolve;
+            });
+        }
+
+        function uiClose(val) {
+            document.getElementById('ui-overlay').style.display = 'none';
+            if (uiResolver) uiResolver(val);
+        }
+
+        async function checkPassManual() {
             if (document.getElementById('hidden-trigger').value === SECRET) {
                 document.getElementById('name-modal').style.display = 'flex';
-            } else { alert("Kode Salah."); }
+            } else { 
+                await customUI("Kode Otentikasi Salah."); 
+            }
         }
 
         function saveNameAndStart() {
@@ -301,15 +284,12 @@
             const div = document.createElement('div');
             div.className = `bubble ${item.nama === myName ? 'me' : 'them'} ${isPending ? 'sending' : 'new-msg'}`;
             div.setAttribute('data-id', index);
-            
             if(item.nama === myName && !isPending) {
                 div.onclick = (e) => showMenu(e, index);
             }
-
             const content = item.pesan.startsWith("data:image") 
                 ? `<img src="${item.pesan}" class="img-msg" loading="lazy">` 
                 : item.pesan;
-                
             div.innerHTML = `<span class="sender-info">${item.nama}</span>${content}${isPending ? '<span class="status-icon"></span>' : ''}`;
             return div;
         }
@@ -317,23 +297,18 @@
         function renderMessages(serverData) {
             const container = document.getElementById('msg-container');
             const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 100;
-            
             const currentBubbles = container.querySelectorAll('.bubble:not(.sending)');
-            
             if (currentBubbles.length !== serverData.length) {
                 container.innerHTML = ""; 
                 serverData.forEach((item, index) => {
                     container.appendChild(createBubbleElement(item, index));
                 });
             }
-
             const existingPending = container.querySelectorAll('.sending');
             existingPending.forEach(el => el.remove());
-            
             pendingMessages.forEach((msg, pIndex) => {
                 container.appendChild(createBubbleElement(msg, `p-${pIndex}`, true));
             });
-            
             if (isAtBottom) container.scrollTop = container.scrollHeight;
         }
 
@@ -342,11 +317,9 @@
                 const res = await fetch(API_URL);
                 const raw = await res.json();
                 const serverData = raw.map(d => ({ nama: d[0], pesan: d[1] }));
-                
                 pendingMessages = pendingMessages.filter(p => 
                     !serverData.some(s => s.nama === myName && s.pesan === p.pesan)
                 );
-
                 renderMessages(serverData);
             } catch (e) {}
         }
@@ -363,7 +336,8 @@
         function closeMenu() { document.getElementById('context-menu').style.display = 'none'; }
 
         async function triggerDelete() {
-            if(!confirm("Hapus pesan ini?")) return;
+            const confirmed = await customUI("Hapus pesan ini?", true);
+            if(!confirmed) return;
             await post("__DELETE__", selectedMsgId);
             closeMenu();
         }
@@ -380,7 +354,6 @@
 
         async function post(val, editIdx = null) {
             const msgObj = { nama: myName, pesan: val };
-            
             if (editIdx === null && val !== "__DELETE__") {
                 pendingMessages.push(msgObj);
                 renderMessages(Array.from(document.querySelectorAll('.bubble:not(.sending)')).map(el => ({
@@ -388,14 +361,7 @@
                     pesan: el.childNodes[1].src || el.childNodes[1].textContent
                 })));
             }
-
-            const payload = { 
-                nama: myName, 
-                pesan: val, 
-                index: editIdx, 
-                action: editIdx !== null ? "edit" : "send" 
-            };
-
+            const payload = { nama: myName, pesan: val, index: editIdx, action: editIdx !== null ? "edit" : "send" };
             try {
                 await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
                 fetchData();
@@ -414,11 +380,13 @@
             }
         }
 
-        function uploadPhoto() {
+        async function uploadPhoto() {
             const file = document.getElementById('fileInp').files[0];
             if(!file) return;
-            // Diubah ke 10MB (10 * 1024 * 1024 bytes)
-            if(file.size > 10 * 1024 * 1024) { alert("File terlalu besar (Maks 10MB)"); return; }
+            if(file.size > 10 * 1024 * 1024) { 
+                await customUI("File terlalu besar (Maks 10MB)"); 
+                return; 
+            }
             const reader = new FileReader();
             reader.onloadend = () => post(reader.result);
             reader.readAsDataURL(file);
