@@ -168,13 +168,15 @@
         .them { align-self: flex-start; background: var(--bubble-them); color: #334155; border-bottom-left-radius: 4px; }
         
         .status-icon { font-size: 0.7rem; margin-left: 8px; color: #94a3b8; float: right; margin-top: 4px; }
-        .sending { opacity: 0.6; }
+        
+        /* Indikator Sedang Mengirim */
+        .sending { opacity: 0.6; filter: grayscale(0.5); }
+        .sending .status-icon::after { content: '⏳'; font-size: 10px; }
 
         .sender-info { font-size: 0.72rem; font-weight: 800; color: var(--accent); margin-bottom: 4px; display: block; text-transform: uppercase; letter-spacing: 0.03em; }
         
-        /* REVISI UKURAN GAMBAR UNTUK PC */
         .img-msg { 
-            max-width: 350px; /* Batasi lebar di PC agar tidak terlalu besar */
+            max-width: 350px; 
             width: 100%;
             height: auto;
             border-radius: 14px; 
@@ -219,7 +221,7 @@
             .container { margin: 15px; padding: 25px; border-radius: 20px; }
             .bubble { max-width: 88%; }
             #bottom-bar { padding: 12px; }
-            .img-msg { max-width: 100%; } /* Kembali ke lebar penuh jika di layar HP */
+            .img-msg { max-width: 100%; }
         }
 
         #msg-container::-webkit-scrollbar { width: 5px; }
@@ -291,6 +293,7 @@
         let isEditing = false;
         let pendingMessages = []; 
         let uiResolver = null;
+        let lastServerData = []; // Menyimpan data terakhir dari server
 
         function customUI(msg, showCancel = false) {
             return new Promise(resolve => {
@@ -359,20 +362,20 @@
         function renderMessages(serverData) {
             const container = document.getElementById('msg-container');
             const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 100;
-            const currentBubbles = container.querySelectorAll('.bubble:not(.sending)');
             
-            if (currentBubbles.length !== serverData.length) {
-                container.innerHTML = ""; 
-                serverData.forEach((item, index) => {
-                    container.appendChild(createBubbleElement(item, index));
-                });
-            }
+            // Bersihkan container
+            container.innerHTML = ""; 
             
-            const existingPending = container.querySelectorAll('.sending');
-            existingPending.forEach(el => el.remove());
+            // Render data dari server
+            serverData.forEach((item, index) => {
+                container.appendChild(createBubbleElement(item, index));
+            });
+            
+            // Render data pending (sedang mengirim)
             pendingMessages.forEach((msg, pIndex) => {
                 container.appendChild(createBubbleElement(msg, `p-${pIndex}`, true));
             });
+
             if (isAtBottom) container.scrollTop = container.scrollHeight;
         }
 
@@ -381,9 +384,14 @@
                 const res = await fetch(API_URL);
                 const raw = await res.json();
                 const serverData = raw.map(d => ({ nama: d[0], pesan: d[1] }));
+                
+                lastServerData = serverData; // Simpan ke cache lokal
+
+                // Filter pendingMessages: Hapus jika pesan sudah masuk ke server data
                 pendingMessages = pendingMessages.filter(p => 
                     !serverData.some(s => s.nama === myName && s.pesan === p.pesan)
                 );
+                
                 renderMessages(serverData);
             } catch (e) {}
         }
@@ -418,37 +426,49 @@
 
         async function post(val, editIdx = null) {
             const msgObj = { nama: myName, pesan: val };
+            
+            // Jika ini pesan baru, masukkan ke daftar pending dan langsung render
             if (editIdx === null && val !== "__DELETE__") {
                 pendingMessages.push(msgObj);
+                renderMessages(lastServerData); // Render ulang seketika
             }
+
             const payload = { nama: myName, pesan: val, index: editIdx, action: editIdx !== null ? "edit" : "send" };
+            
             try {
                 await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
-                fetchData();
+                fetchData(); // Sync ulang setelah berhasil
             } catch (e) { 
-                pendingMessages = [];
-                fetchData();
+                // Jika gagal, bersihkan pending agar tidak nyangkut selamanya
+                pendingMessages = pendingMessages.filter(p => p !== msgObj);
+                renderMessages(lastServerData);
+                await customUI("Gagal mengirim pesan. Periksa koneksi.");
             }
         }
 
         function sendMsg() {
             const input = document.getElementById('text-input');
             if (input.value.trim()) {
-                post(input.value, isEditing ? selectedMsgId : null);
-                input.value = "";
+                const val = input.value;
+                input.value = ""; // Kosongkan input seketika
+                post(val, isEditing ? selectedMsgId : null);
                 isEditing = false;
             }
         }
 
         async function uploadPhoto() {
-            const file = document.getElementById('fileInp').files[0];
+            const fileInp = document.getElementById('fileInp');
+            const file = fileInp.files[0];
             if(!file) return;
             if(file.size > 10 * 1024 * 1024) { 
                 await customUI("File terlalu besar (Maks 10MB)"); 
                 return; 
             }
             const reader = new FileReader();
-            reader.onloadend = () => post(reader.result);
+            reader.onloadend = () => {
+                post(reader.result);
+                fileInp.value = ""; // Reset input file
+            };
             reader.readAsDataURL(file);
         }
 
