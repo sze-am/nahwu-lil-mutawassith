@@ -169,7 +169,6 @@
         
         .status-icon { font-size: 0.7rem; margin-left: 8px; color: #94a3b8; float: right; margin-top: 4px; }
         
-        /* Indikator Sedang Mengirim */
         .sending { opacity: 0.6; filter: grayscale(0.5); }
         .sending .status-icon::after { content: '⏳'; font-size: 10px; }
 
@@ -278,7 +277,7 @@
         </div>
         <div id="msg-container" onclick="closeMenu()"></div>
         <div id="bottom-bar">
-            <input type="file" id="fileInp" hidden onchange="uploadPhoto()">
+            <input type="file" id="fileInp" hidden accept="image/*" onchange="uploadPhoto()">
             <button onclick="document.getElementById('fileInp').click()" style="border:none; background:none; font-size:22px; cursor:pointer; opacity: 0.5;">📎</button>
             <input type="text" id="text-input" placeholder="Ketik pesan diskusi..." autocomplete="off">
             <button class="btn-send" onclick="sendMsg()">➤</button>
@@ -332,7 +331,7 @@
         function downloadImg(dataUrl) {
             const link = document.createElement('a');
             link.href = dataUrl;
-            link.download = `SIAKAD_IMG_${Date.now()}.png`;
+            link.download = `IMG_HD_${Date.now()}.jpg`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -342,9 +341,9 @@
             const div = document.createElement('div');
             const isMe = item.nama === myName;
             div.className = `bubble ${isMe ? 'me' : 'them'} ${isPending ? 'sending' : 'new-msg'}`;
-            // Simpan identitas pesan agar tidak di-render ulang jika sudah ada
-            div.setAttribute('data-key', `${item.nama}-${item.pesan.substring(0,20)}-${index}`);
             div.setAttribute('data-id', index);
+            const key = `${item.nama}-${(item.pesan || "").substring(0,20)}-${index}`;
+            div.setAttribute('data-key', key);
 
             if(isMe && !isPending && !item.pesan.startsWith("data:image")) {
                 div.onclick = (e) => showMenu(e, index);
@@ -352,7 +351,7 @@
 
             let content;
             if (item.pesan.startsWith("data:image")) {
-                content = `<img src="${item.pesan}" class="img-msg" onclick="downloadImg('${item.pesan}')" title="Klik untuk unduh" loading="lazy">`;
+                content = `<img src="${item.pesan}" class="img-msg" onclick="downloadImg('${item.pesan}')" title="Klik untuk unduh HD" loading="lazy">`;
             } else {
                 content = item.pesan;
             }
@@ -365,12 +364,9 @@
             const container = document.getElementById('msg-container');
             const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 100;
             
-            // Dapatkan semua kunci pesan yang ada saat ini di layar
             const existingKeys = Array.from(container.querySelectorAll('.bubble:not(.sending)')).map(el => el.getAttribute('data-key'));
             const serverKeys = serverData.map((item, index) => `${item.nama}-${item.pesan.substring(0,20)}-${index}`);
 
-            // Jika data server berbeda (misal ada pesan dihapus atau pesan baru masuk), update total
-            // Jika hanya tambah pesan, kita append saja tanpa innerHTML = ""
             if (JSON.stringify(existingKeys) !== JSON.stringify(serverKeys)) {
                 container.innerHTML = "";
                 serverData.forEach((item, index) => {
@@ -378,7 +374,6 @@
                 });
             }
 
-            // Bagian Pesan Pending: Hapus yang lama, ganti yang baru
             container.querySelectorAll('.sending').forEach(el => el.remove());
             pendingMessages.forEach((msg, pIndex) => {
                 container.appendChild(createBubbleElement(msg, `p-${pIndex}`, true));
@@ -392,14 +387,8 @@
                 const res = await fetch(API_URL);
                 const raw = await res.json();
                 const serverData = raw.map(d => ({ nama: d[0], pesan: d[1] }));
-                
                 lastServerData = serverData;
-
-                // Sinkronisasi pending: jika pesan sudah muncul di server, hapus dari pending
-                pendingMessages = pendingMessages.filter(p => 
-                    !serverData.some(s => s.nama === myName && s.pesan === p.pesan)
-                );
-                
+                pendingMessages = pendingMessages.filter(p => !serverData.some(s => s.nama === myName && s.pesan === p.pesan));
                 renderMessages(serverData);
             } catch (e) {}
         }
@@ -435,21 +424,18 @@
 
         async function post(val, editIdx = null) {
             const msgObj = { nama: myName, pesan: val };
-            
             if (editIdx === null && val !== "__DELETE__") {
                 pendingMessages.push(msgObj);
                 renderMessages(lastServerData); 
             }
-
             const payload = { nama: myName, pesan: val, index: editIdx, action: editIdx !== null ? "edit" : "send" };
-            
             try {
                 await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
                 fetchData(); 
             } catch (e) { 
                 pendingMessages = pendingMessages.filter(p => p !== msgObj);
                 renderMessages(lastServerData);
-                await customUI("Gagal mengirim. Coba lagi.");
+                await customUI("Koneksi bermasalah.");
             }
         }
 
@@ -463,20 +449,47 @@
             }
         }
 
-        async function uploadPhoto() {
+        // --- REVISI MODE HD (ALGORITMA WHATSAPP) ---
+        function uploadPhoto() {
             const fileInp = document.getElementById('fileInp');
             const file = fileInp.files[0];
             if(!file) return;
-            if(file.size > 10 * 1024 * 1024) { 
-                await customUI("File terlalu besar (Maks 10MB)"); 
-                return; 
-            }
+
             const reader = new FileReader();
-            reader.onloadend = () => {
-                post(reader.result);
-                fileInp.value = ""; 
-            };
             reader.readAsDataURL(file);
+            reader.onload = function(event) {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = function() {
+                    // KONFIGURASI HD:
+                    // Lebar 1280px adalah standar HD WhatsApp. 
+                    // Kualitas 0.8 memberikan detail tajam tapi ukuran file tetap efisien.
+                    const TARGET_WIDTH = 1280; 
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > TARGET_WIDTH) {
+                        height = height * (TARGET_WIDTH / width);
+                        width = TARGET_WIDTH;
+                    }
+
+                    const canvas = document.createElement("canvas");
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    const ctx = canvas.getContext("2d");
+                    // Gunakan imageSmoothing untuk menjaga ketajaman saat resize
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Output format JPEG (karena PNG terlalu berat untuk Base64)
+                    const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
+                    
+                    post(dataUrl);
+                    fileInp.value = ""; 
+                };
+            };
         }
 
         document.getElementById('text-input').addEventListener('keypress', (e) => { 
