@@ -172,8 +172,11 @@
 
         .sender-info { font-size: 0.72rem; font-weight: 800; color: var(--accent); margin-bottom: 4px; display: block; text-transform: uppercase; letter-spacing: 0.03em; }
         
+        /* REVISI UKURAN GAMBAR UNTUK PC */
         .img-msg { 
-            max-width: 100%; 
+            max-width: 350px; /* Batasi lebar di PC agar tidak terlalu besar */
+            width: 100%;
+            height: auto;
             border-radius: 14px; 
             margin-top: 6px; 
             display: block; 
@@ -216,6 +219,7 @@
             .container { margin: 15px; padding: 25px; border-radius: 20px; }
             .bubble { max-width: 88%; }
             #bottom-bar { padding: 12px; }
+            .img-msg { max-width: 100%; } /* Kembali ke lebar penuh jika di layar HP */
         }
 
         #msg-container::-webkit-scrollbar { width: 5px; }
