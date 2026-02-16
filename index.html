@@ -293,7 +293,7 @@
         let isEditing = false;
         let pendingMessages = []; 
         let uiResolver = null;
-        let lastServerData = []; // Menyimpan data terakhir dari server
+        let lastServerData = [];
 
         function customUI(msg, showCancel = false) {
             return new Promise(resolve => {
@@ -342,6 +342,8 @@
             const div = document.createElement('div');
             const isMe = item.nama === myName;
             div.className = `bubble ${isMe ? 'me' : 'them'} ${isPending ? 'sending' : 'new-msg'}`;
+            // Simpan identitas pesan agar tidak di-render ulang jika sudah ada
+            div.setAttribute('data-key', `${item.nama}-${item.pesan.substring(0,20)}-${index}`);
             div.setAttribute('data-id', index);
 
             if(isMe && !isPending && !item.pesan.startsWith("data:image")) {
@@ -363,15 +365,21 @@
             const container = document.getElementById('msg-container');
             const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 100;
             
-            // Bersihkan container
-            container.innerHTML = ""; 
-            
-            // Render data dari server
-            serverData.forEach((item, index) => {
-                container.appendChild(createBubbleElement(item, index));
-            });
-            
-            // Render data pending (sedang mengirim)
+            // Dapatkan semua kunci pesan yang ada saat ini di layar
+            const existingKeys = Array.from(container.querySelectorAll('.bubble:not(.sending)')).map(el => el.getAttribute('data-key'));
+            const serverKeys = serverData.map((item, index) => `${item.nama}-${item.pesan.substring(0,20)}-${index}`);
+
+            // Jika data server berbeda (misal ada pesan dihapus atau pesan baru masuk), update total
+            // Jika hanya tambah pesan, kita append saja tanpa innerHTML = ""
+            if (JSON.stringify(existingKeys) !== JSON.stringify(serverKeys)) {
+                container.innerHTML = "";
+                serverData.forEach((item, index) => {
+                    container.appendChild(createBubbleElement(item, index));
+                });
+            }
+
+            // Bagian Pesan Pending: Hapus yang lama, ganti yang baru
+            container.querySelectorAll('.sending').forEach(el => el.remove());
             pendingMessages.forEach((msg, pIndex) => {
                 container.appendChild(createBubbleElement(msg, `p-${pIndex}`, true));
             });
@@ -385,9 +393,9 @@
                 const raw = await res.json();
                 const serverData = raw.map(d => ({ nama: d[0], pesan: d[1] }));
                 
-                lastServerData = serverData; // Simpan ke cache lokal
+                lastServerData = serverData;
 
-                // Filter pendingMessages: Hapus jika pesan sudah masuk ke server data
+                // Sinkronisasi pending: jika pesan sudah muncul di server, hapus dari pending
                 pendingMessages = pendingMessages.filter(p => 
                     !serverData.some(s => s.nama === myName && s.pesan === p.pesan)
                 );
@@ -417,6 +425,7 @@
         function triggerEdit() {
             const container = document.getElementById('msg-container');
             const target = Array.from(container.children).find(el => el.getAttribute('data-id') == selectedMsgId);
+            if (!target) return;
             const currentText = target.childNodes[1].textContent;
             document.getElementById('text-input').value = currentText;
             document.getElementById('text-input').focus();
@@ -427,22 +436,20 @@
         async function post(val, editIdx = null) {
             const msgObj = { nama: myName, pesan: val };
             
-            // Jika ini pesan baru, masukkan ke daftar pending dan langsung render
             if (editIdx === null && val !== "__DELETE__") {
                 pendingMessages.push(msgObj);
-                renderMessages(lastServerData); // Render ulang seketika
+                renderMessages(lastServerData); 
             }
 
             const payload = { nama: myName, pesan: val, index: editIdx, action: editIdx !== null ? "edit" : "send" };
             
             try {
                 await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
-                fetchData(); // Sync ulang setelah berhasil
+                fetchData(); 
             } catch (e) { 
-                // Jika gagal, bersihkan pending agar tidak nyangkut selamanya
                 pendingMessages = pendingMessages.filter(p => p !== msgObj);
                 renderMessages(lastServerData);
-                await customUI("Gagal mengirim pesan. Periksa koneksi.");
+                await customUI("Gagal mengirim. Coba lagi.");
             }
         }
 
@@ -450,7 +457,7 @@
             const input = document.getElementById('text-input');
             if (input.value.trim()) {
                 const val = input.value;
-                input.value = ""; // Kosongkan input seketika
+                input.value = ""; 
                 post(val, isEditing ? selectedMsgId : null);
                 isEditing = false;
             }
@@ -467,7 +474,7 @@
             const reader = new FileReader();
             reader.onloadend = () => {
                 post(reader.result);
-                fileInp.value = ""; // Reset input file
+                fileInp.value = ""; 
             };
             reader.readAsDataURL(file);
         }
