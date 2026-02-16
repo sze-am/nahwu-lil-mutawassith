@@ -8,17 +8,27 @@
         /* Tampilan Artikel Pelajaran (Samaran) */
         body { font-family: 'Times New Roman', serif; line-height: 1.8; color: #444; padding: 40px; max-width: 700px; margin: auto; background: #fff; }
         
-        /* Input Rahasia untuk memicu keyboard di HP */
+        /* Input Password yang Terlihat Normal */
+        #pass-container {
+            margin-top: 20px;
+            padding: 15px;
+            border-top: 1px solid #eee;
+        }
+        
         #hidden-trigger {
-            position: absolute;
-            opacity: 0;
-            width: 1px;
-            height: 1px;
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            background: #fafafa;
+            outline: none;
+            display: none; /* Muncul saat pemicu diklik */
         }
 
         .hidden-chat { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f0f2f5; z-index: 10000; flex-direction: column; }
         
-        /* Gaya Chat Bubble Minimalis (Bukan WA) */
+        /* Gaya Chat Bubble Minimalis */
         #msg-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; background-color: #f0f2f5; }
         
         .bubble { 
@@ -33,7 +43,6 @@
             box-shadow: 0 1px 1px rgba(0,0,0,0.05);
         }
         
-        /* Bubble Saya: Biru Modern / Gelap */
         .me { 
             align-self: flex-end; 
             background: #007aff; 
@@ -41,7 +50,6 @@
             border-bottom-right-radius: 4px;
         }
         
-        /* Bubble Lawan: Putih Bersih */
         .them { 
             align-self: flex-start; 
             background: #fff; 
@@ -66,8 +74,10 @@
         <h2>Analisis I'rab pada Isim Tasniyah</h2>
         <p>Isim tasniyah adalah isim yang menunjukkan makna dua dengan tambahan alif dan nun pada saat rafa', atau ya' dan nun pada saat nashab dan jar. Contoh dalam kalimat...</p>
         
-        <p><i id="click-trigger" style="cursor:pointer; color: #777;">Ketik untuk lanjut baca...</i></p>
-        <input type="number" id="hidden-trigger" pattern="\d*">
+        <div id="pass-container">
+            <p><i id="click-trigger" style="cursor:pointer; color: #777;">Ketik untuk lanjut baca...</i></p>
+            <input type="password" id="hidden-trigger" placeholder="Masukkan kode akses">
+        </div>
     </div>
 
     <div id="secret-chat" class="hidden-chat">
@@ -89,31 +99,25 @@
         const trigger = document.getElementById('click-trigger');
         const hiddenInput = document.getElementById('hidden-trigger');
 
-        // Munculkan keyboard saat teks diklik
+        // Munculkan kolom input saat teks pemicu diklik
         trigger.addEventListener('click', () => {
+            trigger.style.display = 'none';
+            hiddenInput.style.display = 'block';
             hiddenInput.focus();
         });
 
-        // Tangkap input dari keyboard HP maupun Desktop
+        // Pantau input pada kolom password
         hiddenInput.addEventListener('input', (e) => {
-            keys += e.target.value;
-            e.target.value = ""; // Bersihkan input agar bisa terus mengetik
-            if (keys.includes(SECRET)) {
+            if (e.target.value === SECRET) {
                 startChat();
-                keys = "";
-                hiddenInput.blur(); // Tutup keyboard
+                e.target.value = "";
+                hiddenInput.blur();
             }
         });
 
-        // Tetap dukung keyboard desktop
-        document.addEventListener('keydown', (e) => {
-            if (!isNaN(e.key)) {
-                keys += e.key;
-                if (keys.includes(SECRET)) {
-                    startChat();
-                    keys = "";
-                }
-            }
+        // Mendukung keyboard desktop jika kolom password aktif
+        hiddenInput.addEventListener('keydown', (e) => {
+            // Logika tambahan jika diperlukan, tapi 'input' di atas lebih universal untuk mobile
         });
 
         async function startChat() {
