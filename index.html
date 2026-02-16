@@ -47,7 +47,6 @@
             box-shadow: var(--shadow); 
         }
 
-        /* Artikel Section */
         .article-content { 
             line-height: 1.7; 
             font-family: 'Georgia', serif; 
@@ -56,7 +55,6 @@
         }
         .article-content h2 { color: var(--primary); border-left: 4px solid var(--accent); padding-left: 15px; margin-bottom: 20px; }
 
-        /* Login & Modal UI */
         #login-area { margin-top: 30px; padding-top: 20px; border-top: 1px solid #ebedf0; text-align: center; }
         .input-akademik { 
             width: 100%; 
@@ -68,7 +66,6 @@
             outline: none; 
             transition: 0.2s; 
         }
-        .input-akademik:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,122,255,0.1); }
         .btn-akademik { 
             background: var(--primary); 
             color: white; 
@@ -80,7 +77,6 @@
             margin-top: 10px;
         }
 
-        /* Hidden Chat Interface */
         .hidden-chat { 
             display: none; 
             position: fixed; 
@@ -90,7 +86,6 @@
             flex-direction: column; 
         }
         
-        /* Chat Header & Container */
         #chat-header { 
             background: var(--primary); 
             color: white; 
@@ -109,11 +104,11 @@
             display: flex; 
             flex-direction: column; 
             gap: 6px; 
-            background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); /* Pattern WA */
+            background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
             background-blend-mode: overlay;
+            scroll-behavior: smooth;
         }
 
-        /* Bubbles & Media Fixes */
         .bubble { 
             padding: 8px 12px; 
             border-radius: 10px; 
@@ -121,25 +116,44 @@
             font-size: 0.95rem; 
             position: relative; 
             box-shadow: 0 1px 2px rgba(0,0,0,0.15); 
-            word-wrap: break-word; 
+            word-wrap: break-word;
+            animation: fadeIn 0.3s ease;
         }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .me { align-self: flex-end; background: #dcf8c6; border-top-right-radius: 2px; }
         .them { align-self: flex-start; background: #fff; border-top-left-radius: 2px; }
+        
+        /* Indikator Status Kirim */
+        .status-icon {
+            font-size: 0.7rem;
+            margin-left: 5px;
+            color: #888;
+            float: right;
+            margin-top: 5px;
+        }
+
+        .sending { opacity: 0.7; }
+        .sending .status-icon::after { content: "🕒"; animation: blink 1s infinite; }
+
+        @keyframes blink { 50% { opacity: 0.3; } }
+
         .sender-info { font-size: 0.75rem; font-weight: bold; color: #075e54; margin-bottom: 2px; display: block; }
         
-        /* Gambar Fixed - Tidak Stretched */
         .img-msg { 
             max-width: 100%; 
             max-height: 300px; 
             border-radius: 6px; 
             margin-top: 5px; 
             display: block;
-            object-fit: contain; /* Kunci agar tidak strecth */
+            object-fit: contain;
             background: #eee;
         }
 
-        /* Status & Context Menu */
-        .status-sending { font-size: 0.7rem; color: #666; margin-left: 5px; }
         #context-menu { 
             display: none; 
             position: fixed; 
@@ -154,7 +168,6 @@
         .menu-item:hover { background: #f0f2f5; }
         .menu-item.delete { color: #e41e3f; }
 
-        /* Bottom Bar */
         #bottom-bar { padding: 8px 12px; background: #f0f2f5; display: flex; gap: 8px; align-items: center; }
         #text-input { 
             flex: 1; 
@@ -176,9 +189,10 @@
             align-items: center; 
             justify-content: center;
             font-size: 1.2rem;
+            transition: 0.2s;
         }
+        .btn-send:active { transform: scale(0.9); }
 
-        /* Modal Blur */
         #name-modal { 
             display: none; 
             position: fixed; 
@@ -199,7 +213,6 @@
             box-shadow: 0 8px 30px rgba(0,0,0,0.1); 
         }
 
-        /* Mobile Adjustment */
         @media (max-width: 600px) {
             .container { margin: 0; border-radius: 0; padding: 20px; }
             .bubble { max-width: 85%; }
@@ -265,68 +278,7 @@ C. Pelengkap dan Pengikut (At-Tawabi‘)
 •	‘Athaf
 •	Taukid
 •	Badal
-Mahasiswa dilatih melakukan analisis struktur kalimat kompleks, termasuk jumlah mu‘taridhah dan jumlah syarthiyyah.
-________________________________________
-3. Sistem Marfu‘at, Mansubat, Majrurat, dan Majzumaat
-A. Marfu‘at
-•	Mubtada’
-•	Khabar
-•	Fa‘il
-•	Naibul fa‘il
-•	Isim kana dan khabar inna (dengan analisis perubahan status)
-B. Mansubat
-•	Maf‘ul bih
-•	Isim inna
-•	Khabar kana
-•	Hal
-•	Tamyiz
-•	Istitsna’
-C. Majrurat
-•	Isim majrur bi harf jar
-•	Idhafah
-D. Majzumaat
-•	Fi‘il mudhari’ yang dijazmkan
-•	Jawab syarth
-Kajian dilakukan dengan pendekatan analitis berbasis teks.
-________________________________________
-4. Analisis Teks Turats
-Mahasiswa akan berlatih membaca dan menganalisis teks klasik tanpa harakat, seperti:
-•	Kitab-kitab tafsir
-•	Kitab hadis
-•	Kitab fikih
-•	Kitab ushul
-Tujuan tahap ini adalah melatih:
-•	Ketelitian membaca struktur kalimat
-•	Ketepatan menentukan ‘amil
-•	Argumentasi i‘rab secara ilmiah
-________________________________________
-5. Perbandingan Nahwu Klasik dan Linguistik Modern
-Perkuliahan juga membuka diskusi tentang:
-•	Perbandingan teori ‘amil dengan teori dependensi dalam linguistik modern
-•	Analisis sintaksis Arab dalam perspektif generatif
-•	Relevansi nahwu klasik dalam pembelajaran bahasa Arab kontemporer
-Mahasiswa diajak berpikir kritis terhadap struktur keilmuan nahwu, bukan sekadar menghafalnya.
-________________________________________
-METODOLOGI PEMBELAJARAN
-Perkuliahan menggunakan pendekatan:
-1.	Lecturing Konseptual – penjelasan teori dan kaidah
-2.	Analisis Teks (Textual Analysis) – pembacaan dan i‘rab langsung
-3.	Diskusi Argumentatif – membahas perbedaan pendapat ulama
-4.	Presentasi Mahasiswa – analisis kasus sintaksis tertentu
-5.	Problem-Based Learning – menyelesaikan persoalan gramatikal kompleks
-________________________________________
-CAPAIAN PEMBELAJARAN (CPMK)
-Setelah mengikuti perkuliahan ini, mahasiswa diharapkan mampu:
-1.	Menjelaskan teori dasar dan perkembangan historis ilmu nahwu.
-2.	Menganalisis struktur sintaksis bahasa Arab secara sistematis dan argumentatif.
-3.	Melakukan i‘rab lengkap terhadap teks akademik dan turats.
-4.	Mengidentifikasi perbedaan metodologis antara mazhab nahwu.
-5.	Mengintegrasikan kajian nahwu dengan tafsir, hadis, fikih, dan ushul fikih.
-________________________________________
-PENUTUP AKADEMIK
-Ilmu nahwu pada tingkat perguruan tinggi bukan sekadar alat bantu membaca, tetapi menjadi disiplin analitis yang membentuk ketelitian berpikir, kedalaman argumentasi, dan konsistensi metodologis. Melalui penguasaan nahwu yang komprehensif, mahasiswa mampu membuka khazanah literatur Arab-Islam secara mandiri dan kritis.
-Pembelajaran ini diharapkan tidak hanya menghasilkan kemampuan teknis dalam i‘rab, tetapi juga membentuk karakter akademik yang sistematis, argumentatif, dan ilmiah dalam memahami bahasa sebagai instrumen ilmu pengetahuan.
-
+Mahasiswa dilatih melakukan analisis struktur kalimat kompleks, termasuk jumlah mu‘taridhah dan...
 </p>
         </div>
         <div id="login-area">
@@ -370,6 +322,7 @@ Pembelajaran ini diharapkan tidak hanya menghasilkan kemampuan teknis dalam i‘
         let myName = "";
         let selectedMsgId = null;
         let isEditing = false;
+        let pendingMessages = []; // Menyimpan pesan yang sedang proses kirim
 
         function checkPassManual() {
             if (document.getElementById('hidden-trigger').value === SECRET) {
@@ -394,7 +347,11 @@ Pembelajaran ini diharapkan tidak hanya menghasilkan kemampuan teknis dalam i‘
             const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 100;
             
             container.innerHTML = "";
-            serverData.forEach((item, index) => {
+            
+            // Gabungkan data server dengan pesan yang sedang dikirim (Optimistic UI)
+            const allMessages = [...serverData];
+            
+            allMessages.forEach((item, index) => {
                 const div = document.createElement('div');
                 div.className = `bubble ${item.nama === myName ? 'me' : 'them'}`;
                 
@@ -409,6 +366,17 @@ Pembelajaran ini diharapkan tidak hanya menghasilkan kemampuan teknis dalam i‘
                 div.innerHTML = `<span class="sender-info">${item.nama}</span>${content}`;
                 container.appendChild(div);
             });
+
+            // Tampilkan pesan pending (Animasi Mengirim)
+            pendingMessages.forEach(msg => {
+                const div = document.createElement('div');
+                div.className = `bubble me sending`;
+                const content = msg.pesan.startsWith("data:image") 
+                    ? `<img src="${msg.pesan}" class="img-msg">` 
+                    : msg.pesan;
+                div.innerHTML = `<span class="sender-info">${myName}</span>${content}<span class="status-icon"></span>`;
+                container.appendChild(div);
+            });
             
             if (isAtBottom) container.scrollTop = container.scrollHeight;
         }
@@ -417,7 +385,14 @@ Pembelajaran ini diharapkan tidak hanya menghasilkan kemampuan teknis dalam i‘
             try {
                 const res = await fetch(API_URL);
                 const raw = await res.json();
-                renderMessages(raw.map(d => ({ nama: d[0], pesan: d[1] })));
+                const serverData = raw.map(d => ({ nama: d[0], pesan: d[1] }));
+                
+                // Jika pesan sudah ada di server, hapus dari list pending
+                pendingMessages = pendingMessages.filter(p => 
+                    !serverData.some(s => s.nama === myName && s.pesan === p.pesan)
+                );
+
+                renderMessages(serverData);
             } catch (e) {}
         }
 
@@ -439,9 +414,8 @@ Pembelajaran ini diharapkan tidak hanya menghasilkan kemampuan teknis dalam i‘
         }
 
         function triggerEdit() {
-            const bubbles = document.querySelectorAll('.bubble.me');
-            // Mencari teks di dalam bubble tanpa sender-info
-            const currentText = document.getElementById('msg-container').children[selectedMsgId].lastChild.textContent;
+            const container = document.getElementById('msg-container');
+            const currentText = container.children[selectedMsgId].childNodes[1].textContent;
             document.getElementById('text-input').value = currentText;
             document.getElementById('text-input').focus();
             isEditing = true;
@@ -449,22 +423,29 @@ Pembelajaran ini diharapkan tidak hanya menghasilkan kemampuan teknis dalam i‘
         }
 
         async function post(val, editIdx = null) {
+            const msgObj = { nama: myName, pesan: val };
+            
+            // Jika kirim pesan baru (bukan edit/hapus), tambahkan ke pending untuk animasi
+            if (editIdx === null && val !== "__DELETE__") {
+                pendingMessages.push(msgObj);
+                renderMessages([]); // Re-render instan
+            }
+
             const payload = { 
                 nama: myName, 
                 pesan: val, 
                 index: editIdx, 
                 action: editIdx !== null ? "edit" : "send" 
             };
-            
-            // Optimistic render untuk Hapus
-            if(val === "__DELETE__") {
-                document.getElementById('msg-container').children[editIdx].style.opacity = '0.3';
-            }
 
             try {
                 await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
                 fetchData();
-            } catch (e) { alert("Gagal sinkronisasi."); }
+            } catch (e) { 
+                alert("Gagal mengirim. Periksa koneksi.");
+                pendingMessages = [];
+                fetchData();
+            }
         }
 
         function sendMsg() {
@@ -479,7 +460,6 @@ Pembelajaran ini diharapkan tidak hanya menghasilkan kemampuan teknis dalam i‘
         function uploadPhoto() {
             const file = document.getElementById('fileInp').files[0];
             if(!file) return;
-            // Validasi ukuran
             if(file.size > 1024 * 1024) { alert("File terlalu besar (Maks 1MB)"); return; }
             
             const reader = new FileReader();
