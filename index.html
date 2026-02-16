@@ -3,82 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Studi Kasus Nahwu - Bagian 3</title>
+    <title>Portal Akademik - Studi Nahwu</title>
     <style>
-        /* Tampilan Artikel Pelajaran (Samaran) */
-        body { font-family: 'Times New Roman', serif; line-height: 1.8; color: #444; padding: 40px; max-width: 700px; margin: auto; background: #fff; text-align: justify; }
+        :root { --primary: #1a3a5f; --accent: #007aff; --bg: #f4f7f9; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; color: #333; }
         
-        #pass-container {
-            margin-top: 20px;
-            padding: 15px;
-            border-top: 1px solid #eee;
-            text-align: center;
-        }
-        
-        #hidden-trigger {
-            width: 80%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-            background: #fafafa;
-            outline: none;
-            display: none;
-            margin: 10px auto;
-        }
+        /* Header Ala LMS */
+        header { background: var(--primary); color: white; padding: 15px 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: space-between; }
+        header h1 { font-size: 18px; margin: 0; }
 
-        .hidden-chat { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f0f2f5; z-index: 10000; flex-direction: column; }
+        .container { max-width: 800px; margin: 30px auto; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         
-        /* Gaya Chat Bubble Minimalis */
-        #msg-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; background-color: #f0f2f5; }
+        /* Artikel */
+        .article-content { line-height: 1.8; font-family: 'Times New Roman', serif; font-size: 17px; color: #444; }
+        .article-content h2 { color: var(--primary); border-left: 5px solid var(--primary); padding-left: 15px; }
+
+        /* Password & Name Section */
+        #login-area { margin-top: 30px; padding: 20px; border-top: 2px solid #eee; text-align: center; }
+        .input-akademik { width: 100%; max-width: 300px; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px; margin: 10px 0; outline: none; }
+        .input-akademik:focus { border-color: var(--accent); box-shadow: 0 0 5px rgba(0,122,255,0.2); }
+        .btn-akademik { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; font-weight: 600; }
+
+        /* Hidden Chat UI */
+        .hidden-chat { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #e5ddd5; z-index: 10000; flex-direction: column; }
+        #chat-header { background: var(--primary); color: white; padding: 15px; font-weight: bold; display: flex; align-items: center; gap: 10px; }
+        #msg-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; background: #e5ddd5; }
         
-        .bubble { 
-            margin-bottom: 8px; 
-            padding: 12px 16px; 
-            border-radius: 18px; 
-            max-width: 80%; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            font-size: 14px;
-            line-height: 1.4;
-            position: relative;
-            box-shadow: 0 1px 1px rgba(0,0,0,0.05);
-            word-wrap: break-word;
-        }
-        
-        .me { align-self: flex-end; background: #007aff; color: #fff; border-bottom-right-radius: 4px; }
-        .them { align-self: flex-start; background: #fff; color: #000; border-bottom-left-radius: 4px; border: 1px solid #e0e0e0; }
-        
-        .img-msg { max-width: 100%; border-radius: 12px; display: block; margin-top: 5px; }
-        .sender-info { font-size: 11px; font-weight: 600; margin-bottom: 3px; display: block; opacity: 0.8; }
+        /* Bubbles */
+        .bubble { margin-bottom: 12px; padding: 10px 15px; border-radius: 12px; max-width: 75%; font-size: 14px; line-height: 1.4; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.1); word-wrap: break-word; }
+        .me { align-self: flex-end; background: #dcf8c6; color: #000; border-top-right-radius: 2px; }
+        .them { align-self: flex-start; background: #fff; color: #000; border-top-left-radius: 2px; }
+        .sender-info { font-size: 10px; font-weight: bold; color: #075e54; margin-bottom: 3px; display: block; }
+        .img-msg { max-width: 100%; border-radius: 8px; margin-top: 5px; }
 
         /* Bottom Bar */
-        #bottom-bar { padding: 12px; background: #fff; display: flex; gap: 10px; align-items: center; border-top: 1px solid #ddd; }
-        #text-input { flex: 1; padding: 10px 15px; border-radius: 20px; border: 1px solid #ddd; outline: none; background: #f8f8f8; color: #333; font-size: 16px; }
-        .btn { background: #007aff; border: none; color: white; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; }
-        .btn-img { background: #636e72; font-size: 18px; }
+        #bottom-bar { padding: 10px; background: #f0f0f0; display: flex; gap: 8px; align-items: center; }
+        #text-input { flex: 1; padding: 12px; border-radius: 25px; border: 1px solid #ccc; outline: none; font-size: 15px; }
+        .btn-send { background: #075e54; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+
+        /* Custom Modal (Anti-Prompt) */
+        #name-modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 20000; align-items: center; justify-content: center; }
+        .modal-box { background: white; padding: 30px; border-radius: 10px; text-align: center; width: 90%; max-width: 400px; }
     </style>
 </head>
 <body>
 
-    <div id="decoy-content">
-        <h2>Analisis I'rab pada Isim Tasniyah</h2>
-        <p>Ilmu nahwu merupakan disiplin fundamental dalam studi bahasa Arab yang membahas struktur sintaksis (tarkīb al-jumlah) serta perubahan akhir kata (i‘rāb) berdasarkan fungsi gramatikalnya dalam kalimat.
-            Dalam konteks akademik, nahwu tidak hanya dipahami sebagai seperangkat kaidah, tetapi sebagai sistem analisis linguistik yang membentuk kerangka berpikir sistematis dalam memahami teks Arab klasik maupun
-            kontemporer. Secara historis, fondasi ilmu nahwu dirumuskan secara sistematis oleh para ulama bahasa generasi awal, di antaranya Imam Sibawaih melalui karya monumentalnya, Al-Kitab.</p>
+    <header>
+        <h1>Sistem Informasi Akademik</h1>
+        <div style="font-size: 12px; opacity: 0.8;">Mata Kuliah: Nahwu 3</div>
+    </header>
+
+    <div id="decoy-content" class="container">
+        <div class="article-content">
+            <h2>Analisis Sintaksis Isim Tasniyah</h2>
+            <p>Ilmu nahwu merupakan disiplin fundamental dalam studi bahasa Arab yang membahas struktur sintaksis (tarkīb al-jumlah) serta perubahan akhir kata (i‘rāb) berdasarkan fungsi gramatikalnya dalam kalimat. Kodifikasi ini lahir dari kebutuhan menjaga keakuratan bahasa Arab, terutama dalam memahami Al-Qur'an dan hadis Nabi.</p>
+            <p>Dalam perkuliahan ini, mahasiswa akan mengkaji nahwu secara mendalam melalui beberapa tema utama, termasuk konsep dasar i'rab pada Isim Tasniyah yang menunjukkan makna ganda dengan imbuhan tertentu.</p>
+        </div>
         
-        <div id="pass-container">
-            <p><i id="click-trigger" style="cursor:pointer; color: #777; text-decoration: underline;">Ketik untuk lanjut baca...</i></p>
-            <input type="password" id="hidden-trigger" placeholder="Masukkan kode Mata Kuliah">
+        <div id="login-area">
+            <div id="pass-step">
+                <p style="color: #666; font-size: 14px;">Gunakan kode otentikasi mata kuliah untuk membuka materi lengkap.</p>
+                <input type="password" id="hidden-trigger" class="input-akademik" placeholder="Kode Otentikasi">
+                <br>
+                <button class="btn-akademik" onclick="checkPassManual()">Verifikasi Kode</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="name-modal">
+        <div class="modal-box">
+            <h3 style="margin-top:0">Verifikasi Identitas</h3>
+            <p style="font-size: 14px; color: #666;">Masukkan nama lengkap Anda untuk masuk ke ruang diskusi kelas.</p>
+            <input type="text" id="user-name-input" class="input-akademik" placeholder="Nama Lengkap">
+            <br><br>
+            <button class="btn-akademik" style="width:100%" onclick="saveNameAndStart()">Masuk Ruang Diskusi</button>
         </div>
     </div>
 
     <div id="secret-chat" class="hidden-chat">
+        <div id="chat-header">
+            <div style="width: 10px; height: 10px; background: #25d366; border-radius: 50%;"></div>
+            Diskusi Kelompok - PBA 6A
+        </div>
         <div id="msg-container"></div>
         <div id="bottom-bar">
             <input type="file" id="fileInp" hidden onchange="uploadPhoto()">
-            <button class="btn btn-img" onclick="document.getElementById('fileInp').click()">📷</button>
-            <input type="text" id="text-input" placeholder="Tulis pesan...">
-            <button class="btn" onclick="sendMsg()">➤</button>
+            <button onclick="document.getElementById('fileInp').click()" style="border:none; background:none; font-size:24px; cursor:pointer;">📎</button>
+            <input type="text" id="text-input" placeholder="Ketik pesan diskusi...">
+            <button class="btn-send" onclick="sendMsg()">➤</button>
         </div>
     </div>
 
@@ -86,87 +98,88 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbw7dZ9w-ORcjbo2cjmhLmcX965w18YQrd2mXnj0zjHmpd4Uqswdf8azNoCAUm-Bfd2OHQ/exec"; 
         const SECRET = "21191108";
         let myName = "";
+        let localMessages = []; // Untuk menyimpan chat sementara agar tidak hilang-muncul
 
-        const trigger = document.getElementById('click-trigger');
-        const hiddenInput = document.getElementById('hidden-trigger');
-        const msgContainer = document.getElementById('msg-container');
-
-        trigger.addEventListener('click', () => {
-            trigger.style.display = 'none';
-            hiddenInput.style.display = 'block';
-            hiddenInput.focus();
-        });
-
-        hiddenInput.addEventListener('input', (e) => {
-            if (e.target.value === SECRET) {
-                startChat();
-                e.target.value = "";
-                hiddenInput.blur();
+        function checkPassManual() {
+            const inp = document.getElementById('hidden-trigger').value;
+            if (inp === SECRET) {
+                document.getElementById('name-modal').style.display = 'flex';
+            } else {
+                alert("Kode salah atau kadaluwarsa.");
             }
-        });
+        }
 
-        async function startChat() {
-            if (!myName) myName = prompt("Masukkan Nama:"); 
-            if (myName) {
-                document.getElementById('secret-chat').style.display = 'flex';
+        function saveNameAndStart() {
+            const nameInp = document.getElementById('user-name-input').value;
+            if (nameInp.trim() !== "") {
+                myName = nameInp;
+                document.getElementById('name-modal').style.display = 'none';
                 document.getElementById('decoy-content').style.display = 'none';
+                document.getElementById('secret-chat').style.display = 'flex';
                 fetchData();
                 setInterval(fetchData, 4000);
             }
         }
 
-        // Fungsi Helper untuk membuat bubble chat secara instan
-        function createBubble(name, text, isMe) {
-            const div = document.createElement('div');
-            div.className = `bubble ${isMe ? 'me' : 'them'}`;
-            const isImg = text.startsWith("data:image");
-            const content = isImg ? `<img src="${text}" class="img-msg">` : text;
-            div.innerHTML = `<span class="sender-info">${name}</span>${content}`;
-            msgContainer.appendChild(div);
-            msgContainer.scrollTop = msgContainer.scrollHeight;
+        function renderMessages(data) {
+            const container = document.getElementById('msg-container');
+            container.innerHTML = "";
+            data.forEach(item => {
+                const div = document.createElement('div');
+                div.className = `bubble ${item.nama === myName ? 'me' : 'them'}`;
+                const content = item.pesan.startsWith("data:image") ? `<img src="${item.pesan}" class="img-msg">` : item.pesan;
+                div.innerHTML = `<span class="sender-info">${item.nama}</span>${content}`;
+                container.appendChild(div);
+            });
+            container.scrollTop = container.scrollHeight;
         }
 
         async function fetchData() {
             try {
                 const res = await fetch(API_URL);
-                const data = await res.json();
-                msgContainer.innerHTML = "";
-                data.forEach(item => {
-                    if(!item[0] || !item[1]) return;
-                    createBubble(item[0], item[1], item[0] === myName);
-                });
-            } catch (e) { console.log("Reconnecting..."); }
+                const serverData = await res.json();
+                // Format ulang data dari server [nama, pesan] ke objek
+                const formattedData = serverData.map(d => ({ nama: d[0], pesan: d[1] }));
+                
+                // Gabungkan data server dengan pesan lokal yang belum ada di server (agar tidak hilang-muncul)
+                localMessages = formattedData;
+                renderMessages(localMessages);
+            } catch (e) { console.log("Sinkronisasi..."); }
         }
 
         async function post(val) {
-            // Instant UI Update: Pesan muncul dulu di layar
-            createBubble(myName, val, true);
-            
-            // Pengiriman ke server dilakukan di latar belakang
-            try {
-                await fetch(API_URL, { 
-                    method: "POST", 
-                    mode: 'no-cors', // Mempercepat respon karena tidak menunggu header CORS
-                    body: JSON.stringify({ nama: myName, pesan: val }) 
-                });
-            } catch (e) { console.log("Gagal sinkron"); }
+            // Optimistic Update: Langsung tambahkan ke array lokal
+            const newMessage = { nama: myName, pesan: val };
+            localMessages.push(newMessage);
+            renderMessages(localMessages);
+
+            // Kirim ke backend tanpa menunggu (background sync)
+            fetch(API_URL, { 
+                method: "POST", 
+                body: JSON.stringify({ nama: myName, pesan: val }) 
+            }).catch(e => console.log("Gagal kirim"));
         }
 
         function sendMsg() {
             const input = document.getElementById('text-input');
-            const pesan = input.value;
-            if (pesan) { 
-                input.value = ""; // Kosongkan input seketika
-                post(pesan); 
+            if (input.value.trim()) {
+                post(input.value);
+                input.value = "";
             }
         }
 
         function uploadPhoto() {
             const file = document.getElementById('fileInp').files[0];
+            if(!file) return;
             const reader = new FileReader();
             reader.onloadend = () => post(reader.result);
             reader.readAsDataURL(file);
         }
+
+        // Support Enter Key
+        document.getElementById('text-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') sendMsg();
+        });
     </script>
 </body>
 </html>
