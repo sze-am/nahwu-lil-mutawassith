@@ -117,6 +117,40 @@
         .ui-btn-confirm { background: var(--primary); color: white; }
         .ui-btn-cancel { background: #f1f5f9; color: #64748b; }
 
+        /* --- Image Preview Overlay --- */
+        #img-viewer {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 100001;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #img-viewer img {
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: 8px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        }
+        .viewer-controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+        }
+        .btn-viewer {
+            padding: 12px 25px;
+            border-radius: 30px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-dl { background: #22c55e; color: white; }
+        .btn-close-v { background: rgba(255,255,255,0.2); color: white; }
+
         .hidden-chat { 
             display: none; 
             position: fixed; 
@@ -244,6 +278,14 @@
         </div>
     </div>
 
+    <div id="img-viewer">
+        <img id="viewer-img" src="" alt="Preview">
+        <div class="viewer-controls">
+            <button class="btn-viewer btn-close-v" onclick="closePreview()">Tutup</button>
+            <button id="dl-btn-active" class="btn-viewer btn-dl">Unduh Gambar</button>
+        </div>
+    </div>
+
     <div id="decoy-content" class="container">
         <div class="article-content">
             <h2>Analisis Sintaksis Isim Tasniyah</h2>
@@ -308,6 +350,23 @@
             if (uiResolver) uiResolver(val);
         }
 
+        /* --- PREVIEW SYSTEM --- */
+        function openPreview(src) {
+            const viewer = document.getElementById('img-viewer');
+            const img = document.getElementById('viewer-img');
+            const dlBtn = document.getElementById('dl-btn-active');
+            
+            img.src = src;
+            viewer.style.display = 'flex';
+            
+            // Set action download
+            dlBtn.onclick = () => downloadImg(src);
+        }
+
+        function closePreview() {
+            document.getElementById('img-viewer').style.display = 'none';
+        }
+
         async function checkPassManual() {
             if (document.getElementById('hidden-trigger').value === SECRET) {
                 document.getElementById('name-modal').style.display = 'flex';
@@ -351,7 +410,8 @@
 
             let content;
             if (item.pesan.startsWith("data:image")) {
-                content = `<img src="${item.pesan}" class="img-msg" onclick="downloadImg('${item.pesan}')" title="Klik untuk unduh HD" loading="lazy">`;
+                // Perubahan: Klik gambar akan memanggil openPreview, bukan downloadImg
+                content = `<img src="${item.pesan}" class="img-msg" onclick="openPreview('${item.pesan}')" title="Klik untuk lihat" loading="lazy">`;
             } else {
                 content = item.pesan;
             }
@@ -449,7 +509,6 @@
             }
         }
 
-        // --- REVISI MODE HD (ALGORITMA WHATSAPP) ---
         function uploadPhoto() {
             const fileInp = document.getElementById('fileInp');
             const file = fileInp.files[0];
@@ -461,9 +520,6 @@
                 const img = new Image();
                 img.src = event.target.result;
                 img.onload = function() {
-                    // KONFIGURASI HD:
-                    // Lebar 1280px adalah standar HD WhatsApp. 
-                    // Kualitas 0.8 memberikan detail tajam tapi ukuran file tetap efisien.
                     const TARGET_WIDTH = 1280; 
                     let width = img.width;
                     let height = img.height;
@@ -478,12 +534,10 @@
                     canvas.height = height;
 
                     const ctx = canvas.getContext("2d");
-                    // Gunakan imageSmoothing untuk menjaga ketajaman saat resize
                     ctx.imageSmoothingEnabled = true;
                     ctx.imageSmoothingQuality = 'high';
                     ctx.drawImage(img, 0, 0, width, height);
                     
-                    // Output format JPEG (karena PNG terlalu berat untuk Base64)
                     const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
                     
                     post(dataUrl);
