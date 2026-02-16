@@ -117,7 +117,12 @@
             position: relative; 
             box-shadow: 0 1px 2px rgba(0,0,0,0.15); 
             word-wrap: break-word;
-            animation: fadeIn 0.3s ease;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Hanya animasi untuk pesan yang benar-benar baru */
+        .new-msg {
+            animation: fadeIn 0.3s ease forwards;
         }
 
         @keyframes fadeIn {
@@ -128,7 +133,6 @@
         .me { align-self: flex-end; background: #dcf8c6; border-top-right-radius: 2px; }
         .them { align-self: flex-start; background: #fff; border-top-left-radius: 2px; }
         
-        /* Indikator Status Kirim */
         .status-icon {
             font-size: 0.7rem;
             margin-left: 5px;
@@ -230,56 +234,7 @@
     <div id="decoy-content" class="container">
         <div class="article-content">
             <h2>Analisis Sintaksis Isim Tasniyah</h2>
-            <p>Ilmu nahwu merupakan disiplin utama dalam kajian bahasa Arab yang membahas sistem sintaksis (an-nizham an-nahwi) serta perubahan akhir kata (al-i‘rab) berdasarkan fungsi gramatikalnya dalam struktur kalimat. Dalam konteks akademik, nahwu tidak lagi dipahami sebatas kumpulan kaidah normatif, tetapi sebagai sistem analisis linguistik yang memiliki landasan epistemologis, metodologis, dan historis yang kuat.
-Kodifikasi ilmu nahwu secara sistematis mencapai puncaknya melalui karya monumental Imam Sibawaih dalam Al-Kitab. Karya tersebut menjadi fondasi utama madrasah Bashrah dalam merumuskan prinsip-prinsip gramatika Arab. Perkembangan berikutnya memperlihatkan dinamika intelektual antara mazhab Bashrah dan Kufah dalam menjelaskan fenomena kebahasaan Arab, terutama terkait konsep ‘amil (unsur pengaruh gramatikal), qiyas (analogi), dan sima‘ (transmisi otoritatif dari penutur Arab asli). Seluruh upaya ini bertujuan menjaga kemurnian bahasa Arab, khususnya dalam memahami Al-Qur'an sebagai sumber utama ajaran Islam.
-________________________________________
-LANDASAN EPISTEMOLOGIS ILMU NAHWU
-Dalam perkuliahan ini, mahasiswa diajak memahami bahwa nahwu berdiri di atas beberapa landasan epistemologis:
-1.	As-Sima‘ (السماع)
-Data kebahasaan yang diriwayatkan dari penutur Arab fasih (Arab badui) dan teks otoritatif.
-2.	Al-Qiyas (القياس)
-Penalaran analogis untuk menetapkan hukum terhadap bentuk-bentuk baru berdasarkan pola yang telah ditetapkan.
-3.	Al-‘Illah (العلة النحوية)
-Rasionalisasi atau sebab gramatikal yang menjelaskan mengapa suatu hukum berlaku.
-4.	Al-Ijma‘ (الإجماع)
-Kesepakatan ulama bahasa terhadap suatu kaidah tertentu.
-Mahasiswa tidak hanya mempelajari hasil akhir berupa kaidah, tetapi juga memahami proses penalaran yang melatarbelakanginya.
-________________________________________
-RUANG LINGKUP DAN STRUKTUR MATERI PERKULIAHAN
-1. Teori Dasar dan Konsep Fundamental
-A. Pembagian Kalimat (Al-Kalam)
-•	Isim: ciri-ciri dan tanda-tandanya
-•	Fi‘il: madhi, mudhari’, amr
-•	Huruf: fungsi dan ragamnya
-B. I‘rab dan Bina’
-•	Pengertian i‘rab secara bahasa dan istilah
-•	Macam-macam i‘rab (rafa‘, nashab, jar, jazm)
-•	I‘rab zhahir, taqdiri, dan mahalli
-•	Mabni dan jenis-jenisnya
-C. Teori ‘Amil dan Ma‘mul
-Mahasiswa memahami bahwa perubahan akhir kata terjadi karena adanya ‘amil (faktor pengaruh gramatikal).
-Kajian meliputi:
-•	‘Amil lafzhi dan ma‘nawi
-•	Klasifikasi ‘amil menurut ulama Bashrah dan Kufah
-•	Kritik terhadap teori ‘amil dalam perspektif linguistik modern
-________________________________________
-2. Struktur Jumlah (Sintaksis Kalimat)
-A. Jumlah Ismiyyah
-•	Mubtada’ dan khabar
-•	Variasi khabar (mufrad, jumlah, syibhul jumlah)
-•	Masalah taqdim–ta’khir
-B. Jumlah Fi‘liyyah
-•	Fi‘il dan fa‘il
-•	Naibul fa‘il
-•	Maf‘ul bih dan jenis-jenisnya
-•	Maf‘ul mutlaq, maf‘ul li ajlih, maf‘ul ma‘ah, maf‘ul fih
-C. Pelengkap dan Pengikut (At-Tawabi‘)
-•	Na‘t
-•	‘Athaf
-•	Taukid
-•	Badal
-Mahasiswa dilatih melakukan analisis struktur kalimat kompleks, termasuk jumlah mu‘taridhah dan...
-</p>
+            <p>Ilmu nahwu merupakan disiplin utama dalam kajian bahasa Arab yang membahas sistem sintaksis...</p>
         </div>
         <div id="login-area">
             <input type="password" id="hidden-trigger" class="input-akademik" placeholder="Masukkan Kode Otentikasi">
@@ -322,7 +277,7 @@ Mahasiswa dilatih melakukan analisis struktur kalimat kompleks, termasuk jumlah 
         let myName = "";
         let selectedMsgId = null;
         let isEditing = false;
-        let pendingMessages = []; // Menyimpan pesan yang sedang proses kirim
+        let pendingMessages = []; 
 
         function checkPassManual() {
             if (document.getElementById('hidden-trigger').value === SECRET) {
@@ -342,40 +297,44 @@ Mahasiswa dilatih melakukan analisis struktur kalimat kompleks, termasuk jumlah 
             }
         }
 
+        function createBubbleElement(item, index, isPending = false) {
+            const div = document.createElement('div');
+            div.className = `bubble ${item.nama === myName ? 'me' : 'them'} ${isPending ? 'sending' : 'new-msg'}`;
+            div.setAttribute('data-id', index);
+            
+            if(item.nama === myName && !isPending) {
+                div.onclick = (e) => showMenu(e, index);
+            }
+
+            const content = item.pesan.startsWith("data:image") 
+                ? `<img src="${item.pesan}" class="img-msg" loading="lazy">` 
+                : item.pesan;
+                
+            div.innerHTML = `<span class="sender-info">${item.nama}</span>${content}${isPending ? '<span class="status-icon"></span>' : ''}`;
+            return div;
+        }
+
         function renderMessages(serverData) {
             const container = document.getElementById('msg-container');
             const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 100;
             
-            container.innerHTML = "";
+            // Hapus hanya elemen yang tidak ada di serverData (Diffing logic)
+            // Namun untuk kesederhanaan tanpa flickering, kita bandingkan jumlah elemen
+            const currentBubbles = container.querySelectorAll('.bubble:not(.sending)');
             
-            // Gabungkan data server dengan pesan yang sedang dikirim (Optimistic UI)
-            const allMessages = [...serverData];
+            if (currentBubbles.length !== serverData.length) {
+                container.innerHTML = ""; // Hanya reset jika jumlah data berubah total
+                serverData.forEach((item, index) => {
+                    container.appendChild(createBubbleElement(item, index));
+                });
+            }
+
+            // Tangani Pending Messages tanpa merusak elemen lama
+            const existingPending = container.querySelectorAll('.sending');
+            existingPending.forEach(el => el.remove());
             
-            allMessages.forEach((item, index) => {
-                const div = document.createElement('div');
-                div.className = `bubble ${item.nama === myName ? 'me' : 'them'}`;
-                
-                if(item.nama === myName) {
-                    div.onclick = (e) => showMenu(e, index);
-                }
-
-                const content = item.pesan.startsWith("data:image") 
-                    ? `<img src="${item.pesan}" class="img-msg" loading="lazy">` 
-                    : item.pesan;
-                    
-                div.innerHTML = `<span class="sender-info">${item.nama}</span>${content}`;
-                container.appendChild(div);
-            });
-
-            // Tampilkan pesan pending (Animasi Mengirim)
-            pendingMessages.forEach(msg => {
-                const div = document.createElement('div');
-                div.className = `bubble me sending`;
-                const content = msg.pesan.startsWith("data:image") 
-                    ? `<img src="${msg.pesan}" class="img-msg">` 
-                    : msg.pesan;
-                div.innerHTML = `<span class="sender-info">${myName}</span>${content}<span class="status-icon"></span>`;
-                container.appendChild(div);
+            pendingMessages.forEach((msg, pIndex) => {
+                container.appendChild(createBubbleElement(msg, `p-${pIndex}`, true));
             });
             
             if (isAtBottom) container.scrollTop = container.scrollHeight;
@@ -387,7 +346,7 @@ Mahasiswa dilatih melakukan analisis struktur kalimat kompleks, termasuk jumlah 
                 const raw = await res.json();
                 const serverData = raw.map(d => ({ nama: d[0], pesan: d[1] }));
                 
-                // Jika pesan sudah ada di server, hapus dari list pending
+                // Sinkronisasi pending messages
                 pendingMessages = pendingMessages.filter(p => 
                     !serverData.some(s => s.nama === myName && s.pesan === p.pesan)
                 );
@@ -415,7 +374,8 @@ Mahasiswa dilatih melakukan analisis struktur kalimat kompleks, termasuk jumlah 
 
         function triggerEdit() {
             const container = document.getElementById('msg-container');
-            const currentText = container.children[selectedMsgId].childNodes[1].textContent;
+            const target = Array.from(container.children).find(el => el.getAttribute('data-id') == selectedMsgId);
+            const currentText = target.childNodes[1].textContent;
             document.getElementById('text-input').value = currentText;
             document.getElementById('text-input').focus();
             isEditing = true;
@@ -425,10 +385,12 @@ Mahasiswa dilatih melakukan analisis struktur kalimat kompleks, termasuk jumlah 
         async function post(val, editIdx = null) {
             const msgObj = { nama: myName, pesan: val };
             
-            // Jika kirim pesan baru (bukan edit/hapus), tambahkan ke pending untuk animasi
             if (editIdx === null && val !== "__DELETE__") {
                 pendingMessages.push(msgObj);
-                renderMessages([]); // Re-render instan
+                renderMessages(Array.from(document.querySelectorAll('.bubble:not(.sending)')).map(el => ({
+                    nama: el.querySelector('.sender-info').innerText,
+                    pesan: el.childNodes[1].src || el.childNodes[1].textContent
+                })));
             }
 
             const payload = { 
@@ -442,7 +404,6 @@ Mahasiswa dilatih melakukan analisis struktur kalimat kompleks, termasuk jumlah 
                 await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
                 fetchData();
             } catch (e) { 
-                alert("Gagal mengirim. Periksa koneksi.");
                 pendingMessages = [];
                 fetchData();
             }
@@ -461,7 +422,6 @@ Mahasiswa dilatih melakukan analisis struktur kalimat kompleks, termasuk jumlah 
             const file = document.getElementById('fileInp').files[0];
             if(!file) return;
             if(file.size > 1024 * 1024) { alert("File terlalu besar (Maks 1MB)"); return; }
-            
             const reader = new FileReader();
             reader.onloadend = () => post(reader.result);
             reader.readAsDataURL(file);
