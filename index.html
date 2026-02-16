@@ -5,61 +5,334 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Portal Akademik - Studi Nahwu</title>
     <style>
-        :root { --primary: #1a3a5f; --accent: #007aff; --bg: #f4f7f9; --wa-bg: #e5ddd5; }
-        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg); margin: 0; color: #333; overflow-x: hidden; }
+        :root { 
+            --primary: #1a3a5f; 
+            --accent: #007aff; 
+            --bg: #f0f2f5; 
+            --wa-bg: #e5ddd5; 
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        * { box-sizing: border-box; }
+
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background: var(--bg); 
+            margin: 0; 
+            color: #1c1e21; 
+        }
+
+        /* Layout Utama Responsive */
+        header { 
+            background: var(--primary); 
+            color: white; 
+            padding: 12px 20px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2); 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+        }
+
+        header h1 { font-size: 1.1rem; margin: 0; font-weight: 600; }
+
+        .container { 
+            max-width: 900px; 
+            margin: 20px auto; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: var(--shadow); 
+        }
+
+        /* Artikel Section */
+        .article-content { 
+            line-height: 1.7; 
+            font-family: 'Georgia', serif; 
+            font-size: 1.1rem; 
+            color: #333; 
+        }
+        .article-content h2 { color: var(--primary); border-left: 4px solid var(--accent); padding-left: 15px; margin-bottom: 20px; }
+
+        /* Login & Modal UI */
+        #login-area { margin-top: 30px; padding-top: 20px; border-top: 1px solid #ebedf0; text-align: center; }
+        .input-akademik { 
+            width: 100%; 
+            max-width: 350px; 
+            padding: 12px 16px; 
+            border: 1px solid #dddfe2; 
+            border-radius: 8px; 
+            font-size: 1rem; 
+            outline: none; 
+            transition: 0.2s; 
+        }
+        .input-akademik:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,122,255,0.1); }
+        .btn-akademik { 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            margin-top: 10px;
+        }
+
+        /* Hidden Chat Interface */
+        .hidden-chat { 
+            display: none; 
+            position: fixed; 
+            inset: 0; 
+            background: var(--wa-bg); 
+            z-index: 10000; 
+            flex-direction: column; 
+        }
         
-        header { background: var(--primary); color: white; padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-        header h1 { font-size: 18px; margin: 0; }
+        /* Chat Header & Container */
+        #chat-header { 
+            background: var(--primary); 
+            color: white; 
+            padding: 10px 15px; 
+            font-weight: 600; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px;
+            font-size: 0.95rem;
+        }
 
-        .container { max-width: 800px; margin: 20px auto; background: white; padding: 35px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        .article-content { line-height: 1.8; font-family: 'Times New Roman', serif; font-size: 18px; color: #333; text-align: justify; }
+        #msg-container { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 6px; 
+            background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); /* Pattern WA */
+            background-blend-mode: overlay;
+        }
 
-        #login-area { margin-top: 40px; padding: 30px; border-top: 1px solid #eee; text-align: center; }
-        .input-akademik { width: 100%; max-width: 320px; padding: 14px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; margin: 10px 0; outline: none; }
-        .btn-akademik { background: var(--primary); color: white; border: none; padding: 14px 30px; border-radius: 8px; cursor: pointer; font-weight: 600; }
-
-        .hidden-chat { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--wa-bg); z-index: 10000; flex-direction: column; }
-        #chat-header { background: var(--primary); color: white; padding: 12px 18px; font-weight: 600; display: flex; align-items: center; gap: 12px; }
-        #msg-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 4px; }
-        
-        /* Bubble Styles */
-        .bubble { margin-bottom: 8px; padding: 10px 14px; border-radius: 12px; max-width: 80%; font-size: 14.5px; position: relative; box-shadow: 0 1px 1px rgba(0,0,0,0.1); word-wrap: break-word; cursor: pointer; transition: transform 0.1s; }
-        .bubble:active { transform: scale(0.98); }
+        /* Bubbles & Media Fixes */
+        .bubble { 
+            padding: 8px 12px; 
+            border-radius: 10px; 
+            max-width: 75%; 
+            font-size: 0.95rem; 
+            position: relative; 
+            box-shadow: 0 1px 2px rgba(0,0,0,0.15); 
+            word-wrap: break-word; 
+        }
         .me { align-self: flex-end; background: #dcf8c6; border-top-right-radius: 2px; }
         .them { align-self: flex-start; background: #fff; border-top-left-radius: 2px; }
-        .sender-info { font-size: 11px; font-weight: bold; color: #075e54; margin-bottom: 3px; display: block; }
-        .edited-tag { font-size: 10px; opacity: 0.5; margin-left: 5px; font-style: italic; }
+        .sender-info { font-size: 0.75rem; font-weight: bold; color: #075e54; margin-bottom: 2px; display: block; }
+        
+        /* Gambar Fixed - Tidak Stretched */
+        .img-msg { 
+            max-width: 100%; 
+            max-height: 300px; 
+            border-radius: 6px; 
+            margin-top: 5px; 
+            display: block;
+            object-fit: contain; /* Kunci agar tidak strecth */
+            background: #eee;
+        }
 
-        /* Menu Hapus/Edit (Context Menu) */
-        #context-menu { display: none; position: fixed; background: white; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 30000; overflow: hidden; min-width: 120px; }
-        .menu-item { padding: 12px 15px; font-size: 14px; cursor: pointer; border-bottom: 1px solid #eee; }
-        .menu-item:hover { background: #f5f5f5; }
-        .menu-item.delete { color: #d9534f; }
+        /* Status & Context Menu */
+        .status-sending { font-size: 0.7rem; color: #666; margin-left: 5px; }
+        #context-menu { 
+            display: none; 
+            position: fixed; 
+            background: white; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+            z-index: 30000; 
+            width: 160px;
+            overflow: hidden;
+        }
+        .menu-item { padding: 12px 16px; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        .menu-item:hover { background: #f0f2f5; }
+        .menu-item.delete { color: #e41e3f; }
 
-        #bottom-bar { padding: 10px 15px; background: #f0f0f0; display: flex; gap: 10px; align-items: center; border-top: 1px solid #ddd; }
-        #text-input { flex: 1; padding: 12px 18px; border-radius: 25px; border: 1px solid #ddd; outline: none; font-size: 16px; }
-        .btn-send { background: #075e54; color: white; border: none; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; }
+        /* Bottom Bar */
+        #bottom-bar { padding: 8px 12px; background: #f0f2f5; display: flex; gap: 8px; align-items: center; }
+        #text-input { 
+            flex: 1; 
+            padding: 10px 16px; 
+            border-radius: 20px; 
+            border: 1px solid #ddd; 
+            outline: none; 
+            font-size: 1rem; 
+        }
+        .btn-send { 
+            background: #075e54; 
+            color: white; 
+            border: none; 
+            width: 40px; 
+            height: 40px; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-size: 1.2rem;
+        }
 
-        #name-modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6); z-index: 20000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-        .modal-box { background: white; padding: 35px; border-radius: 15px; text-align: center; width: 85%; max-width: 400px; }
+        /* Modal Blur */
+        #name-modal { 
+            display: none; 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(255,255,255,0.8); 
+            backdrop-filter: blur(8px); 
+            z-index: 20000; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .modal-box { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 16px; 
+            text-align: center; 
+            width: 90%; 
+            max-width: 400px; 
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1); 
+        }
+
+        /* Mobile Adjustment */
+        @media (max-width: 600px) {
+            .container { margin: 0; border-radius: 0; padding: 20px; }
+            .bubble { max-width: 85%; }
+            .img-msg { max-height: 200px; }
+        }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>Sistem Informasi Akademik</h1>
-        <div style="font-size: 12px; opacity: 0.9;">Nahwu III</div>
+        <h1>SIAKAD - Studi Bahasa Arab</h1>
+        <div style="font-size: 11px; font-weight: 500; opacity: 0.8;">Ruang Diskusi Nahwu</div>
     </header>
 
     <div id="decoy-content" class="container">
         <div class="article-content">
             <h2>Analisis Sintaksis Isim Tasniyah</h2>
-            <p>Ilmu nahwu merupakan disiplin fundamental dalam studi bahasa Arab yang membahas struktur sintaksis...</p>
+            <p>Ilmu nahwu merupakan disiplin utama dalam kajian bahasa Arab yang membahas sistem sintaksis (an-nizham an-nahwi) serta perubahan akhir kata (al-i‘rab) berdasarkan fungsi gramatikalnya dalam struktur kalimat. Dalam konteks akademik, nahwu tidak lagi dipahami sebatas kumpulan kaidah normatif, tetapi sebagai sistem analisis linguistik yang memiliki landasan epistemologis, metodologis, dan historis yang kuat.
+Kodifikasi ilmu nahwu secara sistematis mencapai puncaknya melalui karya monumental Imam Sibawaih dalam Al-Kitab. Karya tersebut menjadi fondasi utama madrasah Bashrah dalam merumuskan prinsip-prinsip gramatika Arab. Perkembangan berikutnya memperlihatkan dinamika intelektual antara mazhab Bashrah dan Kufah dalam menjelaskan fenomena kebahasaan Arab, terutama terkait konsep ‘amil (unsur pengaruh gramatikal), qiyas (analogi), dan sima‘ (transmisi otoritatif dari penutur Arab asli). Seluruh upaya ini bertujuan menjaga kemurnian bahasa Arab, khususnya dalam memahami Al-Qur'an sebagai sumber utama ajaran Islam.
+________________________________________
+LANDASAN EPISTEMOLOGIS ILMU NAHWU
+Dalam perkuliahan ini, mahasiswa diajak memahami bahwa nahwu berdiri di atas beberapa landasan epistemologis:
+1.	As-Sima‘ (السماع)
+Data kebahasaan yang diriwayatkan dari penutur Arab fasih (Arab badui) dan teks otoritatif.
+2.	Al-Qiyas (القياس)
+Penalaran analogis untuk menetapkan hukum terhadap bentuk-bentuk baru berdasarkan pola yang telah ditetapkan.
+3.	Al-‘Illah (العلة النحوية)
+Rasionalisasi atau sebab gramatikal yang menjelaskan mengapa suatu hukum berlaku.
+4.	Al-Ijma‘ (الإجماع)
+Kesepakatan ulama bahasa terhadap suatu kaidah tertentu.
+Mahasiswa tidak hanya mempelajari hasil akhir berupa kaidah, tetapi juga memahami proses penalaran yang melatarbelakanginya.
+________________________________________
+RUANG LINGKUP DAN STRUKTUR MATERI PERKULIAHAN
+1. Teori Dasar dan Konsep Fundamental
+A. Pembagian Kalimat (Al-Kalam)
+•	Isim: ciri-ciri dan tanda-tandanya
+•	Fi‘il: madhi, mudhari’, amr
+•	Huruf: fungsi dan ragamnya
+B. I‘rab dan Bina’
+•	Pengertian i‘rab secara bahasa dan istilah
+•	Macam-macam i‘rab (rafa‘, nashab, jar, jazm)
+•	I‘rab zhahir, taqdiri, dan mahalli
+•	Mabni dan jenis-jenisnya
+C. Teori ‘Amil dan Ma‘mul
+Mahasiswa memahami bahwa perubahan akhir kata terjadi karena adanya ‘amil (faktor pengaruh gramatikal).
+Kajian meliputi:
+•	‘Amil lafzhi dan ma‘nawi
+•	Klasifikasi ‘amil menurut ulama Bashrah dan Kufah
+•	Kritik terhadap teori ‘amil dalam perspektif linguistik modern
+________________________________________
+2. Struktur Jumlah (Sintaksis Kalimat)
+A. Jumlah Ismiyyah
+•	Mubtada’ dan khabar
+•	Variasi khabar (mufrad, jumlah, syibhul jumlah)
+•	Masalah taqdim–ta’khir
+B. Jumlah Fi‘liyyah
+•	Fi‘il dan fa‘il
+•	Naibul fa‘il
+•	Maf‘ul bih dan jenis-jenisnya
+•	Maf‘ul mutlaq, maf‘ul li ajlih, maf‘ul ma‘ah, maf‘ul fih
+C. Pelengkap dan Pengikut (At-Tawabi‘)
+•	Na‘t
+•	‘Athaf
+•	Taukid
+•	Badal
+Mahasiswa dilatih melakukan analisis struktur kalimat kompleks, termasuk jumlah mu‘taridhah dan jumlah syarthiyyah.
+________________________________________
+3. Sistem Marfu‘at, Mansubat, Majrurat, dan Majzumaat
+A. Marfu‘at
+•	Mubtada’
+•	Khabar
+•	Fa‘il
+•	Naibul fa‘il
+•	Isim kana dan khabar inna (dengan analisis perubahan status)
+B. Mansubat
+•	Maf‘ul bih
+•	Isim inna
+•	Khabar kana
+•	Hal
+•	Tamyiz
+•	Istitsna’
+C. Majrurat
+•	Isim majrur bi harf jar
+•	Idhafah
+D. Majzumaat
+•	Fi‘il mudhari’ yang dijazmkan
+•	Jawab syarth
+Kajian dilakukan dengan pendekatan analitis berbasis teks.
+________________________________________
+4. Analisis Teks Turats
+Mahasiswa akan berlatih membaca dan menganalisis teks klasik tanpa harakat, seperti:
+•	Kitab-kitab tafsir
+•	Kitab hadis
+•	Kitab fikih
+•	Kitab ushul
+Tujuan tahap ini adalah melatih:
+•	Ketelitian membaca struktur kalimat
+•	Ketepatan menentukan ‘amil
+•	Argumentasi i‘rab secara ilmiah
+________________________________________
+5. Perbandingan Nahwu Klasik dan Linguistik Modern
+Perkuliahan juga membuka diskusi tentang:
+•	Perbandingan teori ‘amil dengan teori dependensi dalam linguistik modern
+•	Analisis sintaksis Arab dalam perspektif generatif
+•	Relevansi nahwu klasik dalam pembelajaran bahasa Arab kontemporer
+Mahasiswa diajak berpikir kritis terhadap struktur keilmuan nahwu, bukan sekadar menghafalnya.
+________________________________________
+METODOLOGI PEMBELAJARAN
+Perkuliahan menggunakan pendekatan:
+1.	Lecturing Konseptual – penjelasan teori dan kaidah
+2.	Analisis Teks (Textual Analysis) – pembacaan dan i‘rab langsung
+3.	Diskusi Argumentatif – membahas perbedaan pendapat ulama
+4.	Presentasi Mahasiswa – analisis kasus sintaksis tertentu
+5.	Problem-Based Learning – menyelesaikan persoalan gramatikal kompleks
+________________________________________
+CAPAIAN PEMBELAJARAN (CPMK)
+Setelah mengikuti perkuliahan ini, mahasiswa diharapkan mampu:
+1.	Menjelaskan teori dasar dan perkembangan historis ilmu nahwu.
+2.	Menganalisis struktur sintaksis bahasa Arab secara sistematis dan argumentatif.
+3.	Melakukan i‘rab lengkap terhadap teks akademik dan turats.
+4.	Mengidentifikasi perbedaan metodologis antara mazhab nahwu.
+5.	Mengintegrasikan kajian nahwu dengan tafsir, hadis, fikih, dan ushul fikih.
+________________________________________
+PENUTUP AKADEMIK
+Ilmu nahwu pada tingkat perguruan tinggi bukan sekadar alat bantu membaca, tetapi menjadi disiplin analitis yang membentuk ketelitian berpikir, kedalaman argumentasi, dan konsistensi metodologis. Melalui penguasaan nahwu yang komprehensif, mahasiswa mampu membuka khazanah literatur Arab-Islam secara mandiri dan kritis.
+Pembelajaran ini diharapkan tidak hanya menghasilkan kemampuan teknis dalam i‘rab, tetapi juga membentuk karakter akademik yang sistematis, argumentatif, dan ilmiah dalam memahami bahasa sebagai instrumen ilmu pengetahuan.
+
+</p>
         </div>
         <div id="login-area">
-            <input type="password" id="hidden-trigger" class="input-akademik" placeholder="Input Kode Akses">
+            <input type="password" id="hidden-trigger" class="input-akademik" placeholder="Masukkan Kode Otentikasi">
             <br>
-            <button class="btn-akademik" onclick="checkPassManual()">Verifikasi Data</button>
+            <button class="btn-akademik" onclick="checkPassManual()">Buka Akses Materi</button>
         </div>
     </div>
 
@@ -70,19 +343,23 @@
 
     <div id="name-modal">
         <div class="modal-box">
-            <h3>Data Mahasiswa</h3>
-            <input type="text" id="user-name-input" class="input-akademik" placeholder="Nama Lengkap">
-            <button class="btn-akademik" style="width:100%" onclick="saveNameAndStart()">Masuk Diskusi</button>
+            <h3 style="margin-top:0">Verifikasi Mahasiswa</h3>
+            <p style="color: #65676b; font-size: 0.9rem;">Nama Anda akan tercatat dalam sistem diskusi kelas.</p>
+            <input type="text" id="user-name-input" class="input-akademik" placeholder="Nama Lengkap Sesuai KTM">
+            <button class="btn-akademik" style="width:100%; margin-top:20px;" onclick="saveNameAndStart()">Masuk ke Ruang Diskusi</button>
         </div>
     </div>
 
     <div id="secret-chat" class="hidden-chat">
-        <div id="chat-header">Diskusi Interaktif - PBA 6A</div>
+        <div id="chat-header">
+            <span style="background: #25d366; width: 10px; height: 10px; border-radius: 50%;"></span>
+            Ruang Diskusi Kelas
+        </div>
         <div id="msg-container" onclick="closeMenu()"></div>
         <div id="bottom-bar">
             <input type="file" id="fileInp" hidden onchange="uploadPhoto()">
-            <button onclick="document.getElementById('fileInp').click()" style="border:none; background:none; font-size:26px; cursor:pointer;">📎</button>
-            <input type="text" id="text-input" placeholder="Tulis pesan diskusi...">
+            <button onclick="document.getElementById('fileInp').click()" style="border:none; background:none; font-size:24px; cursor:pointer;">📎</button>
+            <input type="text" id="text-input" placeholder="Ketik pesan..." autocomplete="off">
             <button class="btn-send" onclick="sendMsg()">➤</button>
         </div>
     </div>
@@ -95,7 +372,9 @@
         let isEditing = false;
 
         function checkPassManual() {
-            if (document.getElementById('hidden-trigger').value === SECRET) document.getElementById('name-modal').style.display = 'flex';
+            if (document.getElementById('hidden-trigger').value === SECRET) {
+                document.getElementById('name-modal').style.display = 'flex';
+            } else { alert("Kode Salah."); }
         }
 
         function saveNameAndStart() {
@@ -112,64 +391,80 @@
 
         function renderMessages(serverData) {
             const container = document.getElementById('msg-container');
+            const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 100;
+            
             container.innerHTML = "";
             serverData.forEach((item, index) => {
                 const div = document.createElement('div');
                 div.className = `bubble ${item.nama === myName ? 'me' : 'them'}`;
                 
-                // Event klik untuk menu (WhatsApp style)
                 if(item.nama === myName) {
-                    div.onclick = (e) => showMenu(e, index, item.pesan);
+                    div.onclick = (e) => showMenu(e, index);
                 }
 
-                const content = item.pesan.startsWith("data:image") ? `<img src="${item.pesan}" class="img-msg">` : item.pesan;
+                const content = item.pesan.startsWith("data:image") 
+                    ? `<img src="${item.pesan}" class="img-msg" loading="lazy">` 
+                    : item.pesan;
+                    
                 div.innerHTML = `<span class="sender-info">${item.nama}</span>${content}`;
                 container.appendChild(div);
             });
-            container.scrollTop = container.scrollHeight;
+            
+            if (isAtBottom) container.scrollTop = container.scrollHeight;
         }
 
         async function fetchData() {
             try {
                 const res = await fetch(API_URL);
                 const raw = await res.json();
-                const formatted = raw.map(d => ({ nama: d[0], pesan: d[1] }));
-                renderMessages(formatted);
+                renderMessages(raw.map(d => ({ nama: d[0], pesan: d[1] })));
             } catch (e) {}
         }
 
-        function showMenu(e, id, currentText) {
+        function showMenu(e, id) {
             e.stopPropagation();
             selectedMsgId = id;
             const menu = document.getElementById('context-menu');
             menu.style.display = 'block';
-            menu.style.left = e.pageX + 'px';
+            menu.style.left = Math.min(e.pageX, window.innerWidth - 170) + 'px';
             menu.style.top = e.pageY + 'px';
         }
 
         function closeMenu() { document.getElementById('context-menu').style.display = 'none'; }
 
         async function triggerDelete() {
-            if(!confirm("Tarik pesan ini?")) return;
-            // Logika: Kirim instruksi khusus ke Backend (POST dengan flag delete)
+            if(!confirm("Hapus pesan ini?")) return;
             await post("__DELETE__", selectedMsgId);
             closeMenu();
         }
 
         function triggerEdit() {
-            const container = document.getElementById('msg-container');
-            const currentPesan = container.children[selectedMsgId].innerText.split('\n')[1];
-            document.getElementById('text-input').value = currentPesan;
+            const bubbles = document.querySelectorAll('.bubble.me');
+            // Mencari teks di dalam bubble tanpa sender-info
+            const currentText = document.getElementById('msg-container').children[selectedMsgId].lastChild.textContent;
+            document.getElementById('text-input').value = currentText;
             document.getElementById('text-input').focus();
             isEditing = true;
             closeMenu();
         }
 
         async function post(val, editIdx = null) {
-            const payload = { nama: myName, pesan: val, index: editIdx, action: editIdx !== null ? "edit" : "send" };
-            // Tampilan instan
-            fetchData(); 
-            await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
+            const payload = { 
+                nama: myName, 
+                pesan: val, 
+                index: editIdx, 
+                action: editIdx !== null ? "edit" : "send" 
+            };
+            
+            // Optimistic render untuk Hapus
+            if(val === "__DELETE__") {
+                document.getElementById('msg-container').children[editIdx].style.opacity = '0.3';
+            }
+
+            try {
+                await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
+                fetchData();
+            } catch (e) { alert("Gagal sinkronisasi."); }
         }
 
         function sendMsg() {
@@ -181,14 +476,20 @@
             }
         }
 
-        // Script sisa sama seperti sebelumnya... (uploadPhoto, Enter key)
         function uploadPhoto() {
             const file = document.getElementById('fileInp').files[0];
+            if(!file) return;
+            // Validasi ukuran
+            if(file.size > 1024 * 1024) { alert("File terlalu besar (Maks 1MB)"); return; }
+            
             const reader = new FileReader();
             reader.onloadend = () => post(reader.result);
             reader.readAsDataURL(file);
         }
-        document.getElementById('text-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMsg(); });
+
+        document.getElementById('text-input').addEventListener('keypress', (e) => { 
+            if (e.key === 'Enter') sendMsg(); 
+        });
     </script>
 </body>
 </html>
